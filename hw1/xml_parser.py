@@ -143,31 +143,31 @@ def total_count(n):
     """ Gets the total number of nodes in an XMLNode tree. """
     return len(n.children) + sum(total_count(c) for c in n.children)
 
-root = XMLNode("", {}, test_snippet)
-
-print "root.tag: ", root.tag
-print "root.attributes: ", root.attributes
-print "root.content: ", repr(root.content)
-print "root.children: ", root.children
-print ""
-print "note.tag: ", root.children[0].tag
-print "note.attributes: ", root.children[0].attributes
-print "note.content: ", repr(root.children[0].content)
-print "note.children: ", root.children[0].children
-print ""
-print "to.tag: ", root.children[0].children[0].tag
-print "to.attributes: ", root.children[0].children[0].attributes
-print "to.content: ", repr(root.children[0].children[0].content)
-print "to.children: ", root.children[0].children[0].children
-print ""
-print "heading.tag: ", root.children[0].children[2].tag
-print "heading.attributes: ", root.children[0].children[2].attributes
-print "heading.content: ", repr(root.children[0].children[2].content)
-print "heading.children: ", root.children[0].children[2].children
-
-
-root = XMLNode("", {}, course_webpage)
-print total_count(root)
+# root = XMLNode("", {}, test_snippet)
+#
+# print "root.tag: ", root.tag
+# print "root.attributes: ", root.attributes
+# print "root.content: ", repr(root.content)
+# print "root.children: ", root.children
+# print ""
+# print "note.tag: ", root.children[0].tag
+# print "note.attributes: ", root.children[0].attributes
+# print "note.content: ", repr(root.children[0].content)
+# print "note.children: ", root.children[0].children
+# print ""
+# print "to.tag: ", root.children[0].children[0].tag
+# print "to.attributes: ", root.children[0].children[0].attributes
+# print "to.content: ", repr(root.children[0].children[0].content)
+# print "to.children: ", root.children[0].children[0].children
+# print ""
+# print "heading.tag: ", root.children[0].children[2].tag
+# print "heading.attributes: ", root.children[0].children[2].attributes
+# print "heading.content: ", repr(root.children[0].children[2].content)
+# print "heading.children: ", root.children[0].children[2].children
+#
+#
+# root = XMLNode("", {}, course_webpage)
+# print total_count(root)
 # print root.find("")[0].content
 # print[l.attributes["href"] for l in links]
 # tbody = root.find("section", id="schedule")[0].find("table")[0].find("tbody")[0]
@@ -181,8 +181,8 @@ print total_count(root)
 # #         print "----------------"
 # print [a.find("td")[0].content for a in tbody.find("tr") if len(a.find("td")) > 1]
 
-
-test = """<a name="access</a>"""
-
-root = XMLNode("", {}, test)
-print root.find("a")[0].tag
+#
+# test = """<a name="access</a>"""
+#
+# root = XMLNode("", {}, test)
+# print root.find("a")[0].tag
