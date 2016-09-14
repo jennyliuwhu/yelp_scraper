@@ -172,19 +172,16 @@ def extract_reviews(url):
     current_page = int(page_count_string[0].strip().split(" ")[-1])
     total_pages = int(page_count_string[-1].strip())
     all_reviews = []
-    tries = 0
-    while current_page <= total_pages and tries < max_tries:
+
+    while current_page <= total_pages:
         start_index = (current_page - 1) * max_page_reviews
-        current_url = url + ("" if current_page == 1 else "?start=%d" % start_index)
-        response = requests.get(current_url)
-        if response.status_code == 200:
-            current_reviews = parse_page(response.content)[0]
-            all_reviews.extend(current_reviews)
-            current_page += 1
-            tries = 0
-        else:
-            time.sleep(crawler_wait)
-            tries += 1
+        if current_page > 1:
+            current_url = url + "?start=%d" % start_index
+            response = requests.get(current_url)
+        current_reviews = parse_page(response.content)[0]
+        all_reviews.extend(current_reviews)
+        current_page += 1
+
     return all_reviews
 
 
