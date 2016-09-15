@@ -4,7 +4,6 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 import re
-import requests
 
 __author__ = 'jialingliu'
 
@@ -15,21 +14,20 @@ tag_open_close = re.compile(r"<(\w+[^>]*?)\s*?([^>]*?)/>", re.DOTALL)
 comment = re.compile(r"<!--(.*?)-->", re.DOTALL)
 xml_prolog = re.compile(r"<\?([^>]*)\?>", re.DOTALL)
 html_declaration = re.compile(r"<!([\w\s]*?)>", re.DOTALL)
-xml_attributes = re.compile(r"(\s+[^=]*)=\"*([^\"]*)\"*", re.DOTALL)
 
-test_snippet = """<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE xml> <!-- not actually valid xml-->
-<!-- This is a comment -->
-<note date="8/31/12">
-    <note date="8/31/12">Tove</note>
-    <from>Jani</from>
-    <heading type="Reminder"/>
-    <body>Don't forget me this weekend!</body>
-    <!-- This is a multiline comment,
-         which take a bit of care to parse -->
-</note>
-"""
-course_webpage = requests.get("http://www.datasciencecourse.org").content
+# test_snippet = """<?xml version="1.0" encoding="UTF-8"?>
+# <!DOCTYPE xml> <!-- not actually valid xml-->
+# <!-- This is a comment -->
+# <note date="8/31/12">
+#     <note date="8/31/12">Tove</note>
+#     <from>Jani</from>
+#     <heading type="Reminder"/>
+#     <body>Don't forget me this weekend!</body>
+#     <!-- This is a multiline comment,
+#          which take a bit of care to parse -->
+# </note>
+# """
+# course_webpage = requests.get("http://www.datasciencecourse.org").content
 
 # multi_comment = """<!--[if lt IE 9]>
 #         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -90,18 +88,12 @@ class XMLNode:
                 continue
 
             if match_open_close:
-                new_attribute = dict()
-                all_attributes = xml_attributes.findall(match_open_close.group(2))
-                for attribute in all_attributes:
-                    new_attribute[attribute[0].strip()] = attribute[1].strip()
+                new_attribute = parse_attributes(match_open_close.group(2))
                 self.children.append(XMLNode(match_open_close.group(1), new_attribute, ""))
                 pos = match_open_close.end()
                 continue
             if match_open:
-                new_attribute = dict()
-                all_attributes = xml_attributes.findall(match_open.group(2))
-                for attribute in all_attributes:
-                    new_attribute[attribute[0].strip()] = attribute[1].strip()
+                new_attribute = parse_attributes(match_open.group(2))
                 self.children.append(XMLNode(match_open.group(1), new_attribute, raw_content[match_open.end():]))
                 if hasattr(self.children[-1], "endpos"):
                     pos = match_open.end() + self.children[-1].endpos
@@ -142,6 +134,20 @@ class XMLNode:
 def total_count(n):
     """ Gets the total number of nodes in an XMLNode tree. """
     return len(n.children) + sum(total_count(c) for c in n.children)
+
+
+def parse_attributes(s):
+    splited = re.compile(r"[\"\']").split(s)[:-1]
+    attributes = dict()
+    for i in range(len(splited)):
+        if i % 2 == 0:
+            # key
+            key = splited[i].split("=")[0].strip()
+        else:
+            # value
+            val = splited[i]
+            attributes[key] = val
+    return attributes
 
 # root = XMLNode("", {}, test_snippet)
 #
@@ -185,4 +191,38 @@ def total_count(n):
 # test = """<a name="access</a>"""
 #
 # root = XMLNode("", {}, test)
-# print root.find("a")[0].tag
+# # print root.find("a")[0].tag
+#
+# test_snippet = """<?xml version="1.0" encoding="UTF-8"?>
+# <!DOCTYPE xml> <!-- not actually valid xml-->
+# <!-- This is a comment -->
+# <!--[if lt IE 9]>
+#     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+#     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+#     <haha />
+#     <to>Tove</to>
+#     <li>
+#     </li>
+#     <from>Jani</from>
+# <![endif]-->
+# <note date="8/31/12" a = "b" haha = 'haha '  class="col-lg-10 col-lg-offset-1" c = 'p '  >
+#     <to>Tove</to>
+#     <li></li>
+#     <from>Jani</from>
+#     <heading type='Reminder' />
+#     <body>Don't forget me this weekend!</body>
+#     <!-- This is a multiline comment,
+#          which take a bit of care to parse -->
+# </note>
+# """
+
+# root = XMLNode("", {}, test_snippet)
+# # print total_count(root)
+#
+# print root.find("note")[0].attributes
+
+# test_att = """ date="8/31/12" a = "b" haha = 'haha    '  class="col-lg-10 col-lg-offset-1" c = 'p '"""
+# print re.compile(r"[\"\']").split(test_att)
+# splited = []
+# for part in test_att.split("="):
+# print parse_attributes(test_att)
